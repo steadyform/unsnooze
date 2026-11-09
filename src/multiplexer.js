@@ -2,6 +2,7 @@ import tmux from './multiplexers/tmux.js';
 import zellij from './multiplexers/zellij.js';
 import herdr from './multiplexers/herdr.js';
 import cmux from './multiplexers/cmux.js';
+import hc from './multiplexers/hc.js';
 import headless from './multiplexers/headless.js';
 import { getConfig } from './settings.js';
 import { MUX_NAMES as NAMES } from './config.js';
@@ -19,7 +20,7 @@ export function backendCanType(backend) {
 }
 
 export function createMultiplexerFactory({
-  backends = { tmux, zellij, herdr, cmux, headless },
+  backends = { tmux, zellij, herdr, cmux, hc, headless },
   getSetting = () => getConfig('multiplexer'),
   env = process.env,
 } = {}) {
@@ -51,6 +52,11 @@ export function createMultiplexerFactory({
     // in which case both TMUX and CMUX_SOCKET_PATH are set and the inner
     // tmux session is what should be driven.
     if (env.CMUX_SOCKET_PATH) return 'cmux';
+    // Herdr 2 (herdr-core, driven by `hc`) sets HC_TERMINAL_ID in every
+    // terminal it hosts. Same ordering reason as cmux: tmux or Zellij inside
+    // a Herdr 2 terminal is the inner pane and wins. Herdr 1's HERDR_ENV is
+    // the unrelated 'herdr' backend above.
+    if (env.HC_TERMINAL_ID) return 'hc';
 
     const tmuxInstalled = isAvailable('tmux');
     const zellijInstalled = isAvailable('zellij');

@@ -17,6 +17,7 @@ import { upsertSession } from './state.js';
 import { latestRateLimitFromTranscript } from './watchers/claude.js';
 import { getMultiplexer } from './multiplexer.js';
 import { tmuxPaneFromEnv } from './multiplexers/tmux.js';
+import { hcSession } from './multiplexers/hc.js';
 import { spawnResumerIfNeeded, ensureDaemon } from './spawn.js';
 import { makeLogger } from './logger.js';
 import { addressHash } from './lease.js';
@@ -44,13 +45,17 @@ function classify(payload, raw) {
 
 export function hookContext(env = process.env, payload = {}) {
   const managedMux = env.UNSNOOZE_MUX;
-  const muxName = managedMux || (env.HERDR_PANE_ID ? 'herdr' : env.ZELLIJ_PANE_ID ? 'zellij' : 'tmux');
+  const muxName = managedMux || (env.HERDR_PANE_ID ? 'herdr' : env.ZELLIJ_PANE_ID ? 'zellij'
+    : (env.HC_TERMINAL_ID && !env.TMUX) ? 'hc' : 'tmux');
   const pane = managedMux
     ? (env.UNSNOOZE_PANE || null)
     : (muxName === 'herdr' ? env.HERDR_PANE_ID
+      : muxName === 'hc' ? env.HC_TERMINAL_ID
       : muxName === 'zellij' ? env.ZELLIJ_PANE_ID : tmuxPaneFromEnv(env) || payload.tmux_pane) || null;
   const paneOwner = muxName === 'herdr'
     ? (managedMux ? env.UNSNOOZE_PANE_OWNER : (env.HERDR_SESSION || 'default'))
+    : muxName === 'hc'
+      ? (managedMux ? env.UNSNOOZE_PANE_OWNER : hcSession(env))
     : muxName === 'zellij'
       ? (managedMux ? env.UNSNOOZE_PANE_OWNER : env.ZELLIJ_SESSION_NAME) || null
       : null;

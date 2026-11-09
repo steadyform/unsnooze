@@ -52,6 +52,8 @@ export function attachHint(muxName, sessionName) {
   // is no command that attaches to a surface from outside cmux, so omit the
   // hint rather than print a `tmux attach` that would silently do nothing.
   if (muxName === 'cmux') return null;
+  // hc terminals are reached by address (`hc attach t7`), not a session name.
+  if (muxName === 'hc') return null;
   // headless has no session at all — its "pane" is a detached pid. The default
   // below would print `tmux attach -t <name>`, which at best does nothing and
   // at worst attaches to an unrelated tmux session that happens to share the

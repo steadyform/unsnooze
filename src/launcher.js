@@ -12,6 +12,7 @@ import { spawnDetached, monitorSpawnArgs, ensureDaemon } from './spawn.js';
 import { makeLogger } from './logger.js';
 import { createLeaseId, processBirth, writeLease, removeLease } from './lease.js';
 import { recordOwnedSession } from './mux-sessions.js';
+import { hcSession } from './multiplexers/hc.js';
 import { AgentDispatchedError, SessionCreateError, attachHint } from './multiplexers/session-name.js';
 
 const log = makeLogger('launcher');
@@ -28,6 +29,10 @@ export function resolvePaneOwner(muxName, env = process.env) {
   if (muxName === 'herdr') {
     return (env.UNSNOOZE_MUX === 'herdr'
       ? env.UNSNOOZE_PANE_OWNER : env.HERDR_SESSION || 'default') || null;
+  }
+  if (muxName === 'hc') {
+    return (env.UNSNOOZE_MUX === 'hc'
+      ? env.UNSNOOZE_PANE_OWNER : hcSession(env)) || null;
   }
   if (muxName === 'zellij') {
     return (env.UNSNOOZE_MUX === 'zellij'

@@ -1,5 +1,18 @@
 # Changelog
 
+## Unreleased
+
+### Herdr 2
+
+- New `hc` backend for Herdr 2 (herdr-core, driven by the `hc` CLI). Inside a
+  Herdr 2 terminal unsnooze used to fall back to tmux, whose session swallowed
+  the OSC 7501 status sequences Herdr 2 detects agents from, so Codex never
+  appeared in the agents panel. The agent now runs in the terminal you opened,
+  limit stops are read with `hc read`, and the wake-up is typed back into that
+  same terminal. If the terminal is gone, the revival opens in a new terminal
+  carrying the old one's Herdr space and tab. Auto-detected from
+  `HC_TERMINAL_ID`; `unsnooze config set multiplexer hc` selects it by hand.
+
 ## 1.21.2 — 2026-11-01
 
 A Codex wake prompt left unsent under a two-row footer is now submitted, and

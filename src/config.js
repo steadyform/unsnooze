@@ -262,12 +262,12 @@ export const LEASE_GRACE_MS = envInt('UNSNOOZE_LEASE_GRACE_MS', 60_000);
 // this list. It lives here, in a module that imports nothing but node builtins,
 // because settings.js and multiplexer.js already import each other — declaring
 // it in either one puts the other in a temporal dead zone at import time.
-// cmux is last: an agent can run tmux inside a cmux surface, so tmux/zellij
+// cmux and hc (Herdr 2) are last: an agent can run tmux inside a cmux surface, so tmux/zellij
 // must win detection when both are signalled (see multiplexer.js: detect()).
 // headless is last of all and never auto-detected from the environment: it is
 // the no-multiplexer fallback (native Windows, servers, CI), and a real pane
 // must always beat it.
-export const MUX_NAMES = ['tmux', 'zellij', 'herdr', 'cmux', 'headless'];
+export const MUX_NAMES = ['tmux', 'zellij', 'herdr', 'cmux', 'hc', 'headless'];
 
 // Where a headless revive tees the agent's output. There is no pane to scroll
 // back through, so the log is the only record of what an unattended run did.

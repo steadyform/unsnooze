@@ -17,7 +17,7 @@
 ("You've hit your usage limit"), your session just… stops.<br/>
 unsnooze auto-resumes them: it tracks **every** limit-stopped session across all
 your projects and **wakes each one up the moment the usage limit resets** — in
-tmux, Zellij, herdr or cmux, and on **macOS, Linux and Windows**, with or
+tmux, Zellij, herdr (1 or 2) or cmux, and on **macOS, Linux and Windows**, with or
 without a terminal multiplexer.
 
 ```sh
@@ -67,8 +67,27 @@ Prefer a text view? Run `unsnooze config set autoDashboard off` to make
 full-screen dashboard. `unsnooze dashboard` still opens it explicitly.
 
 Needs Node ≥ 20.12 on macOS, Linux or Windows. tmux ≥ 3.2, Zellij, herdr ≥ 0.8
-or cmux give pane-level watching; without one, unsnooze runs headless and still
-catches and resumes stops. Every command: [command reference](https://unsnooze.dev/docs/commands/).
+or cmux give pane-level watching, as does Herdr 2 (below); without one, unsnooze runs
+headless and still catches and resumes stops. Every command: [command reference](https://unsnooze.dev/docs/commands/).
+
+### Herdr 2 (`hc`)
+
+Herdr 2 is the desktop app on top of herdr-core, driven by the `hc` CLI; it is a
+different program from the `herdr` TUI (Herdr 1), which keeps its own backend. Inside a Herdr 2 terminal
+(`HC_TERMINAL_ID` is set) unsnooze selects the `hc` backend automatically and
+runs the agent **directly in that terminal**, so the OSC 7501 status the agent
+prints reaches Herdr and it shows in the agents panel. Limit stops are read from
+the terminal with `hc read`; the wake-up is typed into the same terminal with
+`hc send`. Select it by hand with `unsnooze config set multiplexer hc`. tmux or
+Zellij started inside a Herdr 2 terminal still win, as with cmux.
+
+If the terminal is gone at reset time, unsnooze opens a new one with `hc run`
+and copies the old terminal's `herdr.space` / `herdr.tab` labels, so Herdr shows
+it in the same space and tab. Those labels are also saved at launch, because
+`hc rm` deletes them with the terminal. If neither source has them, the revival
+still runs and is still watched, but Herdr does not list it; reach it with
+`hc attach <t>`. `hc` has to be on `PATH`, and unsnooze cannot start an agent
+from outside a Herdr 2 terminal.
 
 ## Supported agents
 

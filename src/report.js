@@ -4,6 +4,7 @@
 // are generic until someone shows us the actual banner).
 
 import { getMultiplexer } from './multiplexer.js';
+import { hcSession } from './multiplexers/hc.js';
 import { stripAnsi } from './patterns.js';
 
 export const REPO_URL = 'https://github.com/saaranshM/unsnooze';
@@ -39,6 +40,7 @@ export async function cmdReport(rest) {
   const selected = getMultiplexer();
   let paneOwner = selected.name === 'herdr'
     ? (process.env.UNSNOOZE_PANE_OWNER || process.env.HERDR_SESSION || 'default')
+    : selected.name === 'hc' ? (process.env.UNSNOOZE_PANE_OWNER || hcSession(process.env))
     : selected.name === 'zellij'
       ? (process.env.UNSNOOZE_PANE_OWNER || process.env.ZELLIJ_SESSION_NAME || null) : null;
   let pane = paneArg || selected.currentPaneId();

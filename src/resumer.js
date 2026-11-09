@@ -284,6 +284,12 @@ function reopenEnv(rec, leaseId, target) {
   if (rec.mux === 'zellij' || rec.mux === 'herdr') {
     env.UNSNOOZE_PANE_OWNER = target || rec.paneOwner || rec.muxSession || '';
   }
+  // hc: the owner is the core session; the dead terminal's address lets
+  // newWindow() put the revival where Herdr 2 showed the old one.
+  if (rec.mux === 'hc') {
+    env.UNSNOOZE_PANE_OWNER = rec.paneOwner || target || '';
+    if (rec.pane) env.UNSNOOZE_REOPEN_PANE = rec.pane;
+  }
   env.UNSNOOZE_LEASE_ID = leaseId;
   return env;
 }
